@@ -2,15 +2,15 @@
 This project aims to create an interactive simulation of a basic pendulum using WebGL. The pendulum will demonstrate the principles of simple harmonic motion, energy conservation, and the effects of varying parameters such as length and mass on oscillation. This simulation will serve as a valuable educational tool to help viewers visualize and understand fundamental concepts in physics.
 
 ## Objectives
--Develop an interactive 3D simulation of a basic pendulum.
+- Develop an interactive 3D simulation of a basic pendulum.
 
--Illustrate the principles of simple harmonic motion through graphical representation.
+- Illustrate the principles of simple harmonic motion through graphical representation.
 
--Allow users to modify key parameters (length, mass, and initial angle) and observe the effects on the pendulum's motion.
+- Allow users to modify key parameters (length, mass, and initial angle) and observe the effects on the pendulum's motion.
 
--Provide real-time calculations and visual feedback on period and energy transformations.
+- Provide real-time calculations and visual feedback on period and energy transformations.
 
--Enhance the user experience with intuitive controls.
+- Enhance the user experience with intuitive controls.
 
 # Technical Approach
 - Framework: Use WebGl for 3D rendering and visualization in the browser.
