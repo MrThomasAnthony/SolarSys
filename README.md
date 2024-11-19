@@ -15,6 +15,36 @@ This project aims to create an interactive simulation of the planets in our sola
 
 - User Interface: Design an intuitive UI for toggling planetary orbits, pausing/resuming the simulation, focusing on specific planets, zooming in and out and adjusting camera angles.
 
+## Details
+### Texture Mapping
+
+- Planets and Sun
+Using high-resolution planetary textures from sources like NASA or public texture libraries, I will apply textures to the spheres (e.g., Earth, Moon, Mars) using UV mapping. For the Sun I will make use of a fiery texture to depict the Sun's surface. A nice to have would be animated noise textures to simulate solar flares.
+
+- Implementation
+Load textures using WebGL's TEXTURE_2D and map them to sphere geometry. For dynamic effects (e.g., Jupiter's storms), animating textures using time-based offsets would really bring the planet to life. animation on textures will be a tough task so this would be a final modification if there is still time.
+
+### Lighting/Shading
+- Point Light for the Sun
+Place a point light at the Sun's position to simulate its illumination while using attenuation to model how light diminishes over distance.
+
+- Diffuse using the Phong reflection model.
+  - Diffuse: For soft, directional light on the planets.
+ 
+### 3D Modeling/Transformations
+To create the celestial bodies, I'll use 3D primitives such as spheres and refine them with shaders.
+
+- Planets and Moons
+I will model planets and moons as spheres using subdivided triangles or built-in sphere-generation utilities.
+Scale each body based on real-world proportions (adjusted for visual clarity).
+- Orbital Paths
+Use circles to represent orbits. Positions will be computed based on Keplerian motion and/or simplified formulas.
+- Sun
+The sun will be modeled as a glowing sphere by applying texture mapping for its fiery surface. A nice feature to have will be a vertex displacement shader to simulate solar activity.
+- Rings
+I will generate multiple small objects like rings efficiently by the use of instancing.
+
+
 # Timeline
 
 | Objective Number | Objective Description                                     | Status                                  |
