@@ -34,15 +34,10 @@ Place a point light at the Sun's position to simulate its illumination while usi
 ### 3D Modeling/Transformations
 To create the celestial bodies, I'll use 3D primitives such as spheres and refine them with shaders.
 
-- Planets and Moons
-I will model planets and moons as spheres using subdivided triangles or built-in sphere-generation utilities.
-Scale each body based on real-world proportions (adjusted for visual clarity).
-- Orbital Paths
-Use circles to represent orbits. Positions will be computed based on Keplerian motion and/or simplified formulas.
-- Sun
-The sun will be modeled as a glowing sphere by applying texture mapping for its fiery surface. A nice feature to have will be a vertex displacement shader to simulate solar activity.
-- Rings
-I will generate multiple small objects like rings efficiently by the use of instancing.
+- Planets and Moons: I will model planets and moons as spheres using subdivided triangles or built-in sphere-generation utilities. Scale each body based on real-world proportions (adjusted for visual clarity).
+- Orbital Paths: Use circles to represent orbits. Positions will be computed based on Keplerian motion and/or simplified formulas.
+- Sun: The sun will be modeled as a glowing sphere by applying texture mapping for its fiery surface. A nice feature to have will be a vertex displacement shader to simulate solar activity.
+- Rings: I will generate multiple small objects like rings efficiently by the use of instancing.
 
 
 # Timeline
