@@ -44,7 +44,7 @@ To create the celestial bodies, I'll use 3D primitives such as spheres and refin
 
 | Objective Number | Objective Description                                     | Status                                  |
 |------------------|-----------------------------------------------------------|-----------------------------------------|
-| 1                | First Proposal Submission                                 | Deadline: November 04 - Midnight        |
+| 1                | First Proposal Submission                                 | Deadline: November 04 - Midnight [PAST DUE!]        |
 | 2                | 2nd Proposal Submission                                   | Deadline: November 18 - Midnight        |
 | 3                | Final Project submission with Presentation                | Deadline: December 09 - 2024 Midnight   |
 
