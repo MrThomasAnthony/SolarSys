@@ -11,7 +11,7 @@ This project aims to create an interactive simulation of the planets in our sola
 # Technical Approach
 - Framework: Use WebGl for 3D rendering and visualization in the browser by rendering multiple spheres to represent the planets in our solar system. In addition, make use of texture mapping for each planet to ensure realism (eg. Earth would be hard to replicated just using color mapping). Make use of Emissive Lighting to replicate the glow effect of the sun and shadowing for demonstration, making the Sun the primary source of light and each planet the object upon which the lighting is reflected on. 
   
-- Algorithms: Implement simplified models of planetary motion based on the rotation of each planet and its transformation along its orbital path.
+- Algorithms: Implement simplified models of planetary motion based on the rotation of each planet and its transformation along its orbital path. Making use of Kepler's laws of planetary motion would be essential for performing transformations on each sphere.
 
 - User Interface: Design an intuitive UI for toggling planetary orbits, pausing/resuming the simulation, focusing on specific planets, zooming in and out and adjusting camera angles.
 
