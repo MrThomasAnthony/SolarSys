@@ -1,40 +1,33 @@
 # Introduction
-This project aims to create an interactive simulation of a basic pendulum using WebGL. The pendulum will demonstrate the principles of simple harmonic motion, energy conservation, and the effects of varying parameters such as length and mass on oscillation. This simulation will serve as a valuable educational tool to help viewers visualize and understand fundamental concepts in physics.
+This project aims to create an interactive simulation of the planets in our solar system using WebGL. The simulation will demonstrate the principles of orbital mechanics and provide a visually engaging and educational experience. Users will gain insight into the relative sizes, distances, and motions of planets within the solar system.
 
 ## Objectives
-- Develop an interactive 3D simulation of a basic pendulum.
-
-- Illustrate the principles of simple harmonic motion through graphical representation.
-
-- Allow users to modify key parameters (length, mass, and initial angle) and observe the effects on the pendulum's motion.
-
-- Provide real-time calculations and visual feedback on period and energy transformations.
-
-- Enhance the user experience with intuitive controls.
+- Develop an interactive 3D simulation of the planets in the solar system.
+- Illustrate key principles of orbital mechanics, such as gravity and elliptical orbits.
+- Allow users to adjust simulation parameters.
+- Provide real-time visualizations of planetary positions and trajectories.
+- Enhance the user experience with intuitive controls and interactive elements.
 
 # Technical Approach
-- Framework: Use WebGl for 3D rendering and visualization in the browser.
+- Framework: Use WebGl for 3D rendering and visualization in the browser by rendering multiple spheres to represent the planets in our solar system. In addition, make use of texture mapping for each planet to ensure realism (eg. Earth would be hard to replicated just using color mapping). Make use of Emissive Lighting to replicate the glow effect of the sun and shadowing for demonstration, making the Sun the primary source of light and each planet the object upon which the lighting is reflected on. 
   
-- Algorithms: Implement the equations of motion for a simple pendulum, focusing on angular displacement and velocity.
-Use trigonometric functions to calculate the pendulum's position based on time.
-Incorporate a damping factor to simulate real-world effects like air resistance.
+- Algorithms: Implement simplified models of planetary motion based on the rotation of each planet and its transformation along its orbital path.
 
-- User Interface: Create a simple UI for adjusting parameters (length, mass, and initial angle) using HTML with JavaScript for interactivity.
+- User Interface: Design an intuitive UI for toggling planetary orbits, pausing/resuming the simulation, focusing on specific planets, zooming in and out and adjusting camera angles.
 
 # Timeline
 
-| Objective Number | Objective Description                                     | Status      |
-|------------------|----------------------------------------------------------|-------------|
-| 1                | First Proposal Submission                                 | Deadline: November 04 - Midnight   |
-| 2                | 2nd Proposal Submission                                   | Deadline: November 18 - Midnight   |
+| Objective Number | Objective Description                                     | Status                                  |
+|------------------|-----------------------------------------------------------|-----------------------------------------|
+| 1                | First Proposal Submission                                 | Deadline: November 04 - Midnight        |
+| 2                | 2nd Proposal Submission                                   | Deadline: November 18 - Midnight        |
 | 3                | Final Project submission with Presentation                | Deadline: December 09 - 2024 Midnight   |
 
 # Potential Challenges
 
-- Physics Accuracy: Ensuring the simulation accurately represents the physics of a pendulum may require fine-tuning of parameters and calculations.
-
-- Performance Optimization: Rendering a smooth animation may require optimizations, especially if adding multiple pendulums or features.
-- User Interface Design: Creating an intuitive UI for parameter adjustments that does not overwhelm the user could be challenging.
-- Debugging: Identifying and fixing bugs in both the physics calculations and the rendering process might take more time than anticipated.
-
-# [DEMO](https://phet.colorado.edu/sims/html/pendulum-lab/latest/pendulum-lab_en.html)
+- Physics Accuracy: Simplifying the complex rotational interactions with respect to the orbital path ensuring the simulation runs efficiently while maintaining realism.
+- Performance Optimization: Rendering smooth animations for multiple planets and moons may require optimizations.
+- User Interface Design: Balancing functionality and simplicity to provide an intuitive experience.
+- Debugging: Identifying and resolving issues in the rendering and motion calculations may be time-intensive.
+  
+# [DEMO](https://sol.simonmclean.dev/)
