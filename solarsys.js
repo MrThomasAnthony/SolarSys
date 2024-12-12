@@ -79,17 +79,21 @@ var FSHADER_SOURCE =
   "     gl_FragColor = vec4(diffuse + ambient, 1.0) * color8;\n" +
   "}\n";
 
+ //defaults
 var lookatx = 0;
 var lookatz = 0;
 var planetSelect = 0;
 
+ //defaults
 var cameraDistanceX = 0;
 var cameraDistanceY = 0;
 var cameraDistanceZ = 25;
 
+ //pause/reset=off
 var isPaused = false;
 var isReset = false;
 
+//place name as text above planet
 const planetNames = [
   "Sun", "Mercury", "Venus", "Earth", "Mars",
   "Jupiter", "Saturn", "Uranus", "Neptune"
@@ -120,6 +124,7 @@ function main() {
     return;
   }
 
+
   if (n < 0) {
     console.log("Failed to set the vertex information");
     return;
@@ -132,7 +137,7 @@ function main() {
   }
 
   gl.enable(gl.DEPTH_TEST);
-
+  
   var u_ModelMatrix = gl.getUniformLocation(gl.program, "u_ModelMatrix");
   var u_MvpMatrix = gl.getUniformLocation(gl.program, "u_MvpMatrix");
   var u_NormalMatrix = gl.getUniformLocation(gl.program, "u_NormalMatrix");
@@ -169,6 +174,7 @@ function main() {
 
   projMatrix.setPerspective(60, canvas.width / canvas.height, 1, 100);
 
+//approximations of planet characteristics
   const orbitalRadii = [0, 3, 6, 9, 12, 15, 20, 25, 30];
   const planetSizes = [0.8, 0.5, 0.7, 0.7, 0.6, 1.2, 1.0, 0.9, 0.8];
   var angles = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -183,6 +189,7 @@ function main() {
       ((2 * Math.PI) / (rotationSpeeds[i] * 365.25)) * 0.5;
       angles[i] = angularVelocities[i];
     } else {
+		//sun at stationary position
       angularVelocities[i] = 0;
       angles[i] = angularVelocities[i];
     }
@@ -207,17 +214,15 @@ function main() {
   var isMouseDown = false;
   var lastMouseX = 0;
   var lastMouseY = 0;
-
+  
   function animate(angle, x, z, index) {
     if (!isPaused) {
-      console.log("Not Paused")
       angles[index] += angularVelocities[index];
       modelMatrix.setRotate(angle, 0, 1, 0);
       modelMatrix.translate(x, 0, z);
       
     }
     else{
-      console.log("Paused")
       modelMatrix.setRotate(angle, 0, 1, 0);
       modelMatrix.translate(x, 0, z);
     }
@@ -267,18 +272,19 @@ function main() {
     gl.uniformMatrix4fv(u_NormalMatrix, false, normalMatrix.elements);
 
     gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_SHORT, 0);
+
   }
   
   function drawJupiterRings(index, angle, x, z) {
-
     animate(angle,x,z,index);
+	//flat sphere for rings
     modelMatrix.scale(
       planetSizes[index] + 0.5,
       planetSizes[index] / 10,
       planetSizes[index] + 0.5
     );
 
-    gl.vertexAttrib1f(a_whichtex, index+1);
+  gl.vertexAttrib1f(a_whichtex, index+1); //cant explain, just wanted a diff texture :)
     gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
     mvpMatrix.set(projMatrix).multiply(viewMatrix).multiply(modelMatrix);
 
@@ -286,18 +292,25 @@ function main() {
     gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements);
     gl.uniformMatrix4fv(u_NormalMatrix, false, normalMatrix.elements);
 
-    gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_SHORT, 0);
+    gl.drawElements(gl.LINE_LOOP, n, gl.UNSIGNED_SHORT, 0);
   }
- 
+ //stored in var for dynamic nature of camera
   var view = viewMatrix.setLookAt(0, 0, cameraDistanceZ, lookatx, 0, lookatz, 0, 1, 0);
+  
   function draw() {
+	//which planet user is looking at
     planet(planetSelect, orbitalRadii, angles);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); 
+	
+	//calculate camera coords
     const x = cameraDistanceZ * Math.sin(polarAngle) * Math.cos(azimuthAngle);
     const y = cameraDistanceZ * Math.cos(polarAngle);
     const z = cameraDistanceZ * Math.sin(polarAngle) * Math.sin(azimuthAngle);
-
-    if(!isReset){
+	
+	console.log(Math.sin(polarAngle) * Math.cos(azimuthAngle))
+	
+    if(!isReset){ //bring camera back to starting position
       polarAngle = Math.PI / 2;
       azimuthAngle = 0;
       cameraDistanceZ = 25
@@ -334,13 +347,13 @@ function main() {
 
   canvas.addEventListener("mousemove", (e) => {
     if (isMouseDown) {
-      const deltaX = e.clientX - lastMouseX;
-      const deltaY = e.clientY - lastMouseY;
+      const deltaX = e.clientX - lastMouseX; //distace from lastx to currentx
+      const deltaY = e.clientY - lastMouseY; //distace from lasty to currenty
 
-      azimuthAngle += deltaX * 0.01;
-      polarAngle -= deltaY * 0.01;
+      azimuthAngle += deltaX * 0.01; //rotation around a y-axis
+      polarAngle -= deltaY * 0.01; //rotation around a xy-axis
 
-      const epsilon = 0.1;
+      const epsilon = 0.1; //dont drop below 0
       polarAngle = Math.max(epsilon, Math.min(Math.PI - epsilon, polarAngle));
 
       lastMouseX = e.clientX;
@@ -376,6 +389,7 @@ function generateStars(ctx, canvas) {
     const y = Math.random() * height;
     const size = Math.random() * 1.0;
 
+	// genrate random colors for stars
     ctx.fillStyle = `rgba(${i * 50}, 255, 255, ${Math.random() * 1.0})`;
     ctx.beginPath();
     ctx.arc(x, y, size, 0, Math.PI * 2);
@@ -467,7 +481,6 @@ function initVertexBuffers(gl) {
     new Uint16Array(indices),
     gl.STATIC_DRAW
   );
-
   return indices.length;
 }
 
@@ -496,6 +509,7 @@ function initArrayBuffer(gl, attribute, data, type, num) {
 
 function initTextures(gl) {
   var textures = [];
+  // create 9 textures and store them in an array
   for (var i = 0; i < 9; i++) {
     textures[i] = gl.createTexture();
     if (!textures[i]) {
@@ -504,6 +518,7 @@ function initTextures(gl) {
     }
   }
 
+	// retrieve the 9 samplers from gl program
   var samplers = [];
   for (var i = 0; i < 9; i++) {
     samplers[i] = gl.getUniformLocation(gl.program, `u_Sampler${i}`);
@@ -525,6 +540,7 @@ function initTextures(gl) {
     "neptune.jpg",
   ];
 
+//load each texture
   for (let i = 0; i < images.length; i++) {
     let image = new Image();
     image.onload = function () {
@@ -549,11 +565,13 @@ function loadTexture(gl, texUnit, texture, image, u_Sampler) {
   gl.uniform1i(u_Sampler, texUnit);
 }
 
+ //function to change values of x and z in viewMatrix, focus of planet
 function planet(index, orbitalRadii, angles) {
   lookatx = orbitalRadii[index] * Math.cos(angles[index]);
   lookatz = orbitalRadii[index] * Math.sin(angles[index]);
 }
 
+  //change global planetSelect var using html button
 function selectPlanet(planetIndex) {
   planetSelect = planetIndex;
   console.log(planetSelect);
