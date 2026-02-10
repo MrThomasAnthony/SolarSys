@@ -23,7 +23,7 @@ var VSHADER_SOURCE =
 
 var FSHADER_SOURCE =
   "#ifdef GL_ES\n" +
-  "precision mediump float;\n" +
+  "precision highp float;\n" +
   "#endif\n" +
   "uniform vec3 u_LightColor;\n" +
   "uniform vec3 u_LightPosition;\n" +
@@ -101,6 +101,11 @@ const planetNames = [
 
 function main() {
   var canvas = document.getElementById("webgl");
+  var dpr = window.devicePixelRatio || 1;
+  canvas.width = window.innerWidth * dpr;
+  canvas.height = window.innerHeight * dpr;
+  canvas.style.width = window.innerWidth + "px";
+  canvas.style.height = window.innerHeight + "px";
   var gl = getWebGLContext(canvas);
 
   var canvas1 = document.getElementById("canvas1");
@@ -174,6 +179,17 @@ function main() {
 
   projMatrix.setPerspective(60, canvas.width / canvas.height, 1, 100);
 
+  window.onresize = function () {
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
+    canvas.style.width = window.innerWidth + "px";
+    canvas.style.height = window.innerHeight + "px";
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    projMatrix.setPerspective(60, canvas.width / canvas.height, 1, 100);
+    generateStars(ctx1, canvas);
+  };
+
 //approximations of planet characteristics
   const orbitalRadii = [0, 3, 6, 9, 12, 15, 20, 25, 30];
   const planetSizes = [0.8, 0.5, 0.7, 0.7, 0.6, 1.2, 1.0, 0.9, 0.8];
@@ -186,7 +202,7 @@ function main() {
   for (var i = 0; i < orbitalRadii.length; i++) {
     if (rotationSpeeds[i] !== 0) {
       angularVelocities[i] =
-      ((2 * Math.PI) / (rotationSpeeds[i] * 365.25)) * 0.5;
+      ((2 * Math.PI) / (rotationSpeeds[i] * 365.25)) * 2.0;
       angles[i] = angularVelocities[i];
     } else {
 		//sun at stationary position
@@ -374,11 +390,13 @@ function main() {
 }
 
 function generateStars(ctx, canvas) {
-  canvas1.width = canvas.width;
-  canvas1.height = canvas.height;
+  ctx.canvas.width = canvas.width;
+  ctx.canvas.height = canvas.height;
+  ctx.canvas.style.width = canvas.style.width;
+  ctx.canvas.style.height = canvas.style.height;
 
   ctx.fillStyle = "black";
-  ctx.fillRect(0, 0, canvas1.width, canvas1.height);
+  ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
   const numStars = 510;
   const width = ctx.canvas.width;
@@ -555,14 +573,48 @@ function initTextures(gl) {
 function loadTexture(gl, texUnit, texture, image, u_Sampler) {
   gl.activeTexture(gl[`TEXTURE${texUnit}`]);
   gl.bindTexture(gl.TEXTURE_2D, texture);
+  
+  // Enable Anisotropic Filtering if available (Fixes grainy textures at oblique angles)
+  var ext = gl.getExtension("EXT_texture_filter_anisotropic") ||
+            gl.getExtension("MOZ_EXT_texture_filter_anisotropic") ||
+            gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic");
+  if (ext) {
+    var max = gl.getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
+    gl.texParameterf(gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, max);
+  }
 
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+    gl.generateMipmap(gl.TEXTURE_2D);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+  } else {
+    var canvas = document.createElement("canvas");
+    canvas.width = nextHighestPowerOfTwo(image.width);
+    canvas.height = nextHighestPowerOfTwo(image.height);
+    var ctx = canvas.getContext("2d");
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvas);
+    gl.generateMipmap(gl.TEXTURE_2D);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+  }
+  
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
   gl.uniform1i(u_Sampler, texUnit);
+}
+
+function isPowerOf2(value) {
+  return (value & (value - 1)) == 0;
+}
+
+function nextHighestPowerOfTwo(x) {
+  var p = 1;
+  while (p < x) p = p << 1;
+  return p;
 }
 
  //function to change values of x and z in viewMatrix, focus of planet
