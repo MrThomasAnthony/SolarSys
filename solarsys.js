@@ -102,10 +102,8 @@ const planetNames = [
 function main() {
   var canvas = document.getElementById("webgl");
   var dpr = window.devicePixelRatio || 1;
-  canvas.width = window.innerWidth * dpr;
-  canvas.height = window.innerHeight * dpr;
-  canvas.style.width = window.innerWidth + "px";
-  canvas.style.height = window.innerHeight + "px";
+  canvas.width = canvas.clientWidth * dpr;
+  canvas.height = canvas.clientHeight * dpr;
   var gl = getWebGLContext(canvas);
 
   var canvas1 = document.getElementById("canvas1");
@@ -124,12 +122,6 @@ function main() {
   }
 
   var n = initVertexBuffers(gl);
-  if (n < 0) {
-    console.log("Failed to set the vertex information");
-    return;
-  }
-
-
   if (n < 0) {
     console.log("Failed to set the vertex information");
     return;
@@ -181,10 +173,8 @@ function main() {
 
   window.onresize = function () {
     var dpr = window.devicePixelRatio || 1;
-    canvas.width = window.innerWidth * dpr;
-    canvas.height = window.innerHeight * dpr;
-    canvas.style.width = window.innerWidth + "px";
-    canvas.style.height = window.innerHeight + "px";
+    canvas.width = canvas.clientWidth * dpr;
+    canvas.height = canvas.clientHeight * dpr;
     gl.viewport(0, 0, canvas.width, canvas.height);
     projMatrix.setPerspective(60, canvas.width / canvas.height, 1, 100);
     generateStars(ctx1, canvas);
@@ -377,6 +367,81 @@ function main() {
     }
   });
 
+  // --- TOUCHSCREEN CONTROLS START ---
+
+  var lastTouchX = -1;
+  var lastTouchY = -1;
+  var initialPinchDistance = -1;
+
+  // Handle Touch Start
+  canvas.addEventListener("touchstart", function(e) {
+    // Prevent default browser scrolling/zooming
+    if (e.cancelable) e.preventDefault(); 
+
+    if (e.touches.length === 1) {
+      // Single finger: Treat as Mouse Down (Rotation)
+      isMouseDown = true;
+      lastTouchX = e.touches[0].clientX;
+      lastTouchY = e.touches[0].clientY;
+    } else if (e.touches.length === 2) {
+      // Two fingers: Treat as Pinch Start (Zoom)
+      isMouseDown = false; // Stop rotating if pinching
+      var dx = e.touches[0].clientX - e.touches[1].clientX;
+      var dy = e.touches[0].clientY - e.touches[1].clientY;
+      initialPinchDistance = Math.sqrt(dx * dx + dy * dy);
+    }
+  }, { passive: false });
+
+  // Handle Touch Move
+  canvas.addEventListener("touchmove", function(e) {
+    if (e.cancelable) e.preventDefault(); // Stop screen scrolling
+
+    // 1. Single Finger Rotation
+    if (e.touches.length === 1 && isMouseDown) {
+      var touchX = e.touches[0].clientX;
+      var touchY = e.touches[0].clientY;
+
+      var deltaX = touchX - lastTouchX;
+      var deltaY = touchY - lastTouchY;
+
+      azimuthAngle += deltaX * 0.01;
+      polarAngle -= deltaY * 0.01;
+
+      // Clamp polar angle (prevent flipping)
+      var epsilon = 0.1;
+      polarAngle = Math.max(epsilon, Math.min(Math.PI - epsilon, polarAngle));
+
+      lastTouchX = touchX;
+      lastTouchY = touchY;
+    } 
+    // 2. Two Finger Pinch Zoom
+    else if (e.touches.length === 2) {
+      var dx = e.touches[0].clientX - e.touches[1].clientX;
+      var dy = e.touches[0].clientY - e.touches[1].clientY;
+      var currentDistance = Math.sqrt(dx * dx + dy * dy);
+
+      if (initialPinchDistance > 0) {
+        var pinchDelta = initialPinchDistance - currentDistance;
+        
+        // Adjust sensitivity (0.05 is the speed)
+        // If fingers move apart (negative delta), we zoom in (decrease Z)
+        cameraDistanceZ += pinchDelta * 0.05; 
+      }
+      
+      // Update distance for the next frame
+      initialPinchDistance = currentDistance;
+    }
+  }, { passive: false });
+
+  // Handle Touch End
+  canvas.addEventListener("touchend", function(e) {
+    // Reset states when fingers are lifted
+    isMouseDown = false;
+    initialPinchDistance = -1;
+  });
+
+  // --- TOUCHSCREEN CONTROLS END ---
+
   document.getElementById("pauseButton").addEventListener("click", function () {
     isPaused = !isPaused;
     this.textContent = !isPaused ? "Pause" : "Resume";
@@ -392,8 +457,6 @@ function main() {
 function generateStars(ctx, canvas) {
   ctx.canvas.width = canvas.width;
   ctx.canvas.height = canvas.height;
-  ctx.canvas.style.width = canvas.style.width;
-  ctx.canvas.style.height = canvas.style.height;
 
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
